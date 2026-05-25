@@ -13,7 +13,7 @@ export async function listArtworks(req: Request, res: Response) {
       where,
       include: {
         artist: {
-          select: { id: true, name: true, photoUrl: true },
+          select: { id: true, name: true, firstName: true, photoUrl: true },
         },
         images: { orderBy: { order: 'asc' } },
       },
@@ -33,7 +33,7 @@ export async function getArtwork(req: Request, res: Response) {
       where: { id },
       include: {
         artist: {
-          select: { id: true, name: true, photoUrl: true, bio: true },
+          select: { id: true, name: true, firstName: true, photoUrl: true, bio: true },
         },
         images: { orderBy: { order: 'asc' } },
         reviews: {
@@ -55,7 +55,7 @@ export async function getArtwork(req: Request, res: Response) {
 export async function createArtwork(req: Request, res: Response) {
   try {
     const {
-      title, description, technique, dimensions, year,
+      title, description, technique, style, dimensions, year,
       hasOriginal, hasPrint, originalPrice, printPrice,
       artistId, images,
     } = req.body
@@ -65,6 +65,7 @@ export async function createArtwork(req: Request, res: Response) {
         title,
         description: description || null,
         technique: technique || null,
+        style: style || null,
         dimensions: dimensions || null,
         year: year ? Number(year) : null,
         hasOriginal: hasOriginal ?? false,
@@ -99,7 +100,7 @@ export async function updateArtwork(req: Request, res: Response) {
   try {
     const id = Number(req.params.id)
     const {
-      title, description, technique, dimensions, year,
+      title, description, technique, style, dimensions, year,
       hasOriginal, hasPrint, originalPrice, printPrice,
     } = req.body
 
@@ -109,6 +110,7 @@ export async function updateArtwork(req: Request, res: Response) {
         title,
         description,
         technique,
+        style,
         dimensions,
         year: year ? Number(year) : null,
         hasOriginal,

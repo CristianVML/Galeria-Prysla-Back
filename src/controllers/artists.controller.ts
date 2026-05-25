@@ -49,17 +49,19 @@ export async function getArtist(req: Request, res: Response) {
 export async function updateArtist(req: Request, res: Response) {
   try {
     const id = Number(req.params.id)
-    const { name, bio, whatsappNumber, photoUrl } = req.body
+    const { name, firstName, bio, whatsappNumber, photoUrl, city, email } = req.body
 
     const artist = await prisma.artist.update({
       where: { id },
-      data: { name, bio, whatsappNumber, photoUrl },
+      data: { name, firstName, bio, whatsappNumber, photoUrl, city, email },
       select: {
         id: true,
         name: true,
+        firstName: true,
         email: true,
         photoUrl: true,
         bio: true,
+        city: true,
         whatsappNumber: true,
         accountStatus: true,
       },

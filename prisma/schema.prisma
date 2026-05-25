@@ -10,7 +10,9 @@ datasource db {
 model Artist {
   id              Int       @id @default(autoincrement()) @map("id_artista")
   name            String    @db.VarChar(150)
+  firstName       String?   @db.VarChar(100) @map("nombre_pila")
   bio             String?   @db.Text
+  city            String?   @db.VarChar(100)
   photoUrl        String?   @db.VarChar(500) @map("foto_perfil")
   whatsappNumber  String?   @db.VarChar(20) @map("numero_whatsapp")
   email           String    @unique @db.VarChar(255)
@@ -41,6 +43,7 @@ model Artwork {
   title            String    @db.VarChar(255)
   description      String?   @db.Text
   technique        String?   @db.VarChar(150)
+  style            String?   @db.VarChar(150)
   dimensions       String?   @db.VarChar(100)
   year             Int?
   hasOriginal      Boolean   @default(false) @map("tiene_original")
@@ -70,6 +73,15 @@ model Image {
   artwork         Artwork @relation(fields: [artworkId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@map("imagen")
+}
+
+model Subscriber {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique @db.VarChar(255)
+  name      String?  @db.VarChar(150)
+  createdAt DateTime @default(now()) @map("creado_en")
+
+  @@map("suscriptor")
 }
 
 model Review {

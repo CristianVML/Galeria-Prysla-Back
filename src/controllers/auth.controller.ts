@@ -5,7 +5,7 @@ import { generateToken } from '../lib/jwt'
 
 export async function registerArtist(req: Request, res: Response) {
   try {
-    const { name, email, password, bio, whatsappNumber } = req.body
+    const { name, email, password, bio, whatsappNumber, photoUrl } = req.body
 
     const exists = await prisma.artist.findUnique({ where: { email } })
     if (exists) {
@@ -19,6 +19,7 @@ export async function registerArtist(req: Request, res: Response) {
         name,
         email,
         passwordHash,
+        photoUrl: photoUrl || null,
         bio: bio || null,
         whatsappNumber: whatsappNumber || null,
       },
@@ -65,7 +66,11 @@ export async function loginArtist(req: Request, res: Response) {
       artist: {
         id: artist.id,
         name: artist.name,
+        firstName: artist.firstName,
         email: artist.email,
+        bio: artist.bio,
+        city: artist.city,
+        whatsappNumber: artist.whatsappNumber,
         photoUrl: artist.photoUrl,
         accountStatus: artist.accountStatus,
       },

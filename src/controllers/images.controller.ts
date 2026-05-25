@@ -53,6 +53,72 @@ export async function uploadImage(req: Request, res: Response) {
   }
 }
 
+export async function uploadProfilePhoto(req: Request, res: Response) {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No se envió ningún archivo' })
+    }
+
+    const buffer = req.file.buffer
+    const artistId = Number(req.body.artistId)
+
+    if (!artistId) {
+      return res.status(400).json({ error: 'artistId es requerido' })
+    }
+
+    const artist = await prisma.artist.findUnique({ where: { id: artistId } })
+    if (!artist) {
+      return res.status(404).json({ error: 'Artista no encontrado' })
+    }
+
+    const result = await new Promise<UploadApiResponse>((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        { folder: `prysla/artistas/${artistId}`, resource_type: 'image' },
+        (error, result) => {
+          if (error) reject(error)
+          else resolve(result!)
+        }
+      )
+      uploadStream.end(buffer)
+    })
+
+    const updated = await prisma.artist.update({
+      where: { id: artistId },
+      data: { photoUrl: result.secure_url },
+    })
+
+    return res.json({ photoUrl: updated.photoUrl })
+  } catch (error) {
+    console.error(error)
+    return res.status(500).json({ error: 'Error al subir foto de perfil' })
+  }
+}
+
+export async function uploadTempProfilePhoto(req: Request, res: Response) {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No se envió ningún archivo' })
+    }
+
+    const buffer = req.file.buffer
+    const result = await new Promise<UploadApiResponse>((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        { folder: 'prysla/artistas/temp', resource_type: 'image' },
+        (error, result) => {
+          if (error) reject(error)
+          else resolve(result!)
+        }
+      )
+      uploadStream.end(buffer)
+    })
+
+    return res.json({ url: result.secure_url })
+  } catch (error) {
+    console.error(error)
+    return res.status(500).json({ error: 'Error al subir foto' })
+  }
+}
+
 export async function deleteImage(req: Request, res: Response) {
   try {
     const id = Number(req.params.id)
