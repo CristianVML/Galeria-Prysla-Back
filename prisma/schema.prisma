@@ -1,0 +1,87 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Artist {
+  id              Int       @id @default(autoincrement()) @map("id_artista")
+  name            String    @db.VarChar(150)
+  bio             String?   @db.Text
+  photoUrl        String?   @db.VarChar(500) @map("foto_perfil")
+  whatsappNumber  String?   @db.VarChar(20) @map("numero_whatsapp")
+  email           String    @unique @db.VarChar(255)
+  passwordHash    String    @db.VarChar(255) @map("password_hash")
+  accountStatus   String    @default("active") @db.VarChar(50) @map("estado_cuenta")
+  createdAt       DateTime  @default(now()) @map("creado_en")
+  updatedAt       DateTime  @updatedAt @map("actualizado_en")
+
+  artworks        Artwork[]
+
+  @@map("artista")
+}
+
+model Admin {
+  id              Int       @id @default(autoincrement()) @map("id_admin")
+  name            String    @db.VarChar(150)
+  email           String    @unique @db.VarChar(255)
+  passwordHash    String    @db.VarChar(255) @map("password_hash")
+  createdAt       DateTime  @default(now()) @map("creado_en")
+
+  reviews         Review[]
+
+  @@map("administrador")
+}
+
+model Artwork {
+  id               Int       @id @default(autoincrement()) @map("id_obra")
+  title            String    @db.VarChar(255)
+  description      String?   @db.Text
+  technique        String?   @db.VarChar(150)
+  dimensions       String?   @db.VarChar(100)
+  year             Int?
+  hasOriginal      Boolean   @default(false) @map("tiene_original")
+  hasPrint         Boolean   @default(false) @map("tiene_print")
+  originalPrice    Float?    @map("precio_original")
+  printPrice       Float?    @map("precio_print")
+  approvalStatus   String    @default("pending") @db.VarChar(50) @map("estado_aprobacion")
+  adminComment     String?   @db.Text @map("comentario_admin")
+  artistId         Int       @map("id_artista")
+  createdAt        DateTime  @default(now()) @map("creado_en")
+  updatedAt        DateTime  @updatedAt @map("actualizado_en")
+
+  artist           Artist    @relation(fields: [artistId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  images           Image[]
+  reviews          Review[]
+
+  @@map("obra")
+}
+
+model Image {
+  id              Int    @id @default(autoincrement()) @map("id_imagen")
+  urlCloudinary   String @db.VarChar(500) @map("url_cloudinary")
+  publicId        String @default("") @db.VarChar(255) @map("public_id")
+  order           Int    @default(0)
+  artworkId       Int    @map("id_obra")
+
+  artwork         Artwork @relation(fields: [artworkId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@map("imagen")
+}
+
+model Review {
+  id              Int      @id @default(autoincrement()) @map("id_revision")
+  artworkId       Int      @map("id_obra")
+  adminId         Int      @map("id_admin")
+  decision        String   @db.VarChar(50)
+  comment         String?  @db.Text
+  createdAt       DateTime @default(now()) @map("fecha")
+
+  artwork         Artwork @relation(fields: [artworkId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  admin           Admin   @relation(fields: [adminId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  @@map("revision")
+}
