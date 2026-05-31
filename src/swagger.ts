@@ -181,11 +181,10 @@ const options: swaggerJsdoc.Options = {
         },
         NewsletterSubscribeInput: {
           type: 'object',
-          required: ['email', 'captchaToken'],
+          required: ['email'],
           properties: {
             email: { type: 'string', format: 'email' },
             name: { type: 'string' },
-            captchaToken: { type: 'string' },
           },
         },
         MessageResponse: {

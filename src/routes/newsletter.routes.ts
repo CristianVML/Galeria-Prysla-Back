@@ -29,7 +29,7 @@ const router: Router = Router()
  *             schema:
  *               $ref: '#/components/schemas/MessageResponse'
  *       400:
- *         description: Email requerido o captcha inválido
+ *         description: Email requerido
  *         content:
  *           application/json:
  *             schema:

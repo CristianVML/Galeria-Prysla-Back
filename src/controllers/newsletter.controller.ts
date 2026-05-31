@@ -3,24 +3,10 @@ import { prisma } from '../lib/prisma'
 
 export async function subscribe(req: Request, res: Response) {
   try {
-    const { email, name, captchaToken } = req.body
+    const { email, name } = req.body
 
     if (!email) {
       return res.status(400).json({ error: 'Email es requerido' })
-    }
-
-    if (!captchaToken) {
-      return res.status(400).json({ error: 'Captcha requerido' })
-    }
-
-    const verifyRes = await fetch(
-      `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${captchaToken}`,
-      { method: 'POST' }
-    )
-    const verifyData = await verifyRes.json() as { success: boolean }
-
-    if (!verifyData.success) {
-      return res.status(400).json({ error: 'Captcha inválido' })
     }
 
     const exists = await prisma.subscriber.findUnique({ where: { email } })
